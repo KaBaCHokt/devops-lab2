@@ -1,0 +1,40 @@
+<?php
+// Настройки базы данных
+$db_file = __DIR__ . '/survey.db';
+
+try {
+    // Создаем подключение к SQLite
+    $pdo = new PDO("sqlite:$db_file");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    
+    // Создаем таблицу, если её нет
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS survey_responses (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name VARCHAR(100) NOT NULL,
+            backend VARCHAR(50) NOT NULL,
+            frontend TEXT,
+            experience VARCHAR(50) NOT NULL,
+            os VARCHAR(50) NOT NULL,
+            ip_address VARCHAR(45) NOT NULL,
+            user_agent TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    ");
+    
+    // Создаем индексы для быстрого поиска
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_backend ON survey_responses(backend)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_experience ON survey_responses(experience)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_os ON survey_responses(os)");
+    $pdo->exec("CREATE INDEX IF NOT EXISTS idx_created_at ON survey_responses(created_at)");
+    
+} catch (PDOException $e) {
+    die("Ошибка подключения к базе данных: " . $e->getMessage());
+}
+
+// Функция для безопасного вывода данных
+function escape($data) {
+    return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+}
+?>

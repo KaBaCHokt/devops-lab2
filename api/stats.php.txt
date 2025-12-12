@@ -1,0 +1,47 @@
+<?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+header('Cache-Control: no-cache, must-revalidate');
+
+require_once '../db-init.php';
+
+try {
+    // Общая статистика
+    $total = $pdo->query("SELECT COUNT(*) as count FROM survey_responses")->fetch()['count'];
+    $today = $pdo->query("SELECT COUNT(*) as count FROM survey_responses WHERE DATE(created_at) = CURDATE()")->fetch()['count'];
+    
+    // Популярная технология
+    $top_tech = $pdo->query("
+        SELECT backend 
+        FROM survey_responses 
+        GROUP BY backend 
+        ORDER BY COUNT(*) DESC 
+        LIMIT 1
+    ")->fetch()['backend'] ?? null;
+    
+    // Статистика за последние 7 дней
+    $weekly_stats = $pdo->query("
+        SELECT DATE(created_at) as date, COUNT(*) as count
+        FROM survey_responses 
+        WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+        GROUP BY DATE(created_at)
+        ORDER BY date
+    ")->fetchAll();
+    
+    echo json_encode([
+        'success' => true,
+        'total' => (int)$total,
+        'today' => (int)$today,
+        'top_tech' => $top_tech,
+        'weekly_stats' => $weekly_stats,
+        'timestamp' => date('Y-m-d H:i:s')
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        'success' => false,
+        'error' => 'Ошибка получения статистики: ' . $e->getMessage()
+    ], JSON_UNESCAPED_UNICODE);
+}
+?>

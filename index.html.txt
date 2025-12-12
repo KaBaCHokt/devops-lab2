@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Опросник: Технологии разработки</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-poll"></i>
+                <h1>Опросник разработчика</h1>
+            </div>
+            <p class="subtitle">Узнайте, какие технологии используют другие программисты</p>
+        </header>
+
+        <!-- Основной контент -->
+        <main class="main-content">
+            <!-- Карточки действий -->
+            <div class="action-cards">
+                <div class="card survey-card">
+                    <div class="card-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h2>Пройти опрос</h2>
+                    <p>Ответьте на 5 вопросов о технологиях, которые вы используете в работе</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-clock"></i> 2-3 минуты</li>
+                        <li><i class="fas fa-question-circle"></i> 5 вопросов</li>
+                        <li><i class="fas fa-lock"></i> Анонимно</li>
+                    </ul>
+                    <a href="survey.php" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Начать опрос
+                    </a>
+                </div>
+
+                <div class="card results-card">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <h2>Посмотреть результаты</h2>
+                    <p>Узнайте статистику по всем пройденным опросам</p>
+                    <ul class="card-features">
+                        <li><i class="fas fa-chart-pie"></i> Графики</li>
+                        <li><i class="fas fa-table"></i> Таблицы</li>
+                        <li><i class="fas fa-users"></i> Статистика</li>
+                    </ul>
+                    <a href="results.php" class="btn btn-secondary">
+                        <i class="fas fa-chart-line"></i> Смотреть статистику
+                    </a>
+                </div>
+            </div>
+
+            <!-- Быстрая статистика -->
+            <div class="stats-preview">
+                <h2><i class="fas fa-tachometer-alt"></i> Быстрая статистика</h2>
+                <div class="stats-grid" id="quickStats">
+                    <div class="stat-item loading">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Всего участников</h3>
+                            <p class="stat-number">Загрузка...</p>
+                        </div>
+                    </div>
+                    <div class="stat-item loading">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Ответов сегодня</h3>
+                            <p class="stat-number">Загрузка...</p>
+                        </div>
+                    </div>
+                    <div class="stat-item loading">
+                        <div class="stat-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Популярная технология</h3>
+                            <p class="stat-text">Загрузка...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Информация о сервере -->
+            <div class="server-info">
+                <h2><i class="fas fa-server"></i> Информация о системе</h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <i class="fas fa-globe"></i>
+                        <div>
+                            <h3>Веб-сервер</h3>
+                            <p>Nginx + PHP-FPM</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fas fa-database"></i>
+                        <div>
+                            <h3>База данных</h3>
+                            <p>SQLite 3</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fab fa-php"></i>
+                        <div>
+                            <h3>Версия PHP</h3>
+                            <p id="phpVersion">Загрузка...</p>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <i class="fab fa-git-alt"></i>
+                        <div>
+                            <h3>Развертывание</h3>
+                            <p>Git + AlmaLinux</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Как это работает -->
+            <div class="how-it-works">
+                <h2><i class="fas fa-cogs"></i> Как работает опросник</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Проходите опрос</h3>
+                        <p>Отвечаете на вопросы о технологиях, которые используете</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Данные сохраняются</h3>
+                        <p>Ваши ответы анонимно сохраняются в базу данных</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Смотрите статистику</h3>
+                        <p>В реальном времени видите, что выбирают другие</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Подвал -->
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-poll"></i>
+                    <span>Опросник разработчика</span>
+                </div>
+                <div class="footer-links">
+                    <a href="survey.php"><i class="fas fa-edit"></i> Опрос</a>
+                    <a href="results.php"><i class="fas fa-chart-bar"></i> Результаты</a>
+                    <a href="#" onclick="showAbout()"><i class="fas fa-info-circle"></i> О проекте</a>
+                </div>
+                <div class="footer-copy">
+                    <p>&copy; 2024 Веб-опросник. Все данные анонимны.</p>
+                    <p class="tech-stack">PHP + SQLite + Nginx + AlmaLinux</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Модальное окно "О проекте" -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-info-circle"></i> О проекте</h2>
+                <span class="close" onclick="closeAbout()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <h3>Технологии проекта:</h3>
+                <ul>
+                    <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript (чистый)</li>
+                    <li><strong>Backend:</strong> PHP 8.2+</li>
+                    <li><strong>База данных:</strong> SQLite (файловая, не требует сервера)</li>
+                    <li><strong>Веб-сервер:</strong> Nginx + PHP-FPM</li>
+                    <li><strong>ОС:</strong> AlmaLinux 9</li>
+                    <li><strong>Развертывание:</strong> Git + GitHub</li>
+                </ul>
+                <h3>Функциональность:</h3>
+                <ul>
+                    <li>Анонимный опрос разработчиков</li>
+                    <li>Сохранение результатов в БД</li>
+                    <li>Статистика в реальном времени</li>
+                    <li>Адаптивный дизайн</li>
+                    <li>Без перезагрузки страницы (AJAX)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Загрузка статистики при открытии страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadQuickStats();
+            loadPHPVersion();
+        });
+
+        // Загрузка быстрой статистики
+        async function loadQuickStats() {
+            try {
+                const response = await fetch('api/stats.php');
+                const data = await response.json();
+                
+                const statsContainer = document.getElementById('quickStats');
+                statsContainer.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Всего участников</h3>
+                            <p class="stat-number">${data.total || 0}</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Ответов сегодня</h3>
+                            <p class="stat-number">${data.today || 0}</p>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Популярная технология</h3>
+                            <p class="stat-text">${data.top_tech || 'Нет данных'}</p>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+                document.getElementById('quickStats').innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>Не удалось загрузить статистику</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Загрузка версии PHP
+        async function loadPHPVersion() {
+            try {
+                const response = await fetch('api/info.php');
+                const data = await response.json();
+                document.getElementById('phpVersion').textContent = data.php_version;
+            } catch (error) {
+                document.getElementById('phpVersion').textContent = 'Ошибка загрузки';
+            }
+        }
+
+        // Модальное окно "О проекте"
+        function showAbout() {
+            document.getElementById('aboutModal').style.display = 'block';
+        }
+
+        function closeAbout() {
+            document.getElementById('aboutModal').style.display = 'none';
+        }
+
+        // Закрытие модального окна при клике вне его
+        window.onclick = function(event) {
+            const modal = document.getElementById('aboutModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

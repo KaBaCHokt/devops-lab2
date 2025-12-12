@@ -1,0 +1,24 @@
+<?php
+header('Content-Type: application/json');
+header('Access-Control-Allow-Origin: *');
+
+echo json_encode([
+    'success' => true,
+    'php_version' => phpversion(),
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+    'server_name' => $_SERVER['SERVER_NAME'] ?? 'localhost',
+    'project_name' => 'Опросник разработчика',
+    'technologies' => [
+        'backend' => 'PHP ' . phpversion(),
+        'database' => 'SQLite 3',
+        'webserver' => 'Nginx',
+        'os' => 'AlmaLinux'
+    ],
+    'features' => [
+        'Анонимные опросы',
+        'Статистика в реальном времени',
+        'Графики и диаграммы',
+        'Адаптивный дизайн'
+    ]
+], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+?>
