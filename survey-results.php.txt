@@ -1,0 +1,117 @@
+<?php
+require_once 'db-init.php';
+
+$survey_id = $_GET['id'] ?? 0;
+
+// Информация об опросе
+$survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ?");
+$survey->execute([$survey_id]);
+$survey_data = $survey->fetch(PDO::FETCH_ASSOC);
+
+if (!$survey_data) {
+    die("Опрос не найден.");
+}
+
+// Вопросы опроса
+$questions = $pdo->prepare("
+    SELECT * FROM survey_questions 
+    WHERE survey_id = ? 
+    ORDER BY question_order
+");
+$questions->execute([$survey_id]);
+$questions_data = $questions->fetchAll(PDO::FETCH_ASSOC);
+
+// Статистика по каждому вопросу
+foreach ($questions_data as &$question) {
+    $stats = $pdo->prepare("
+        SELECT answer, COUNT(*) as count 
+        FROM user_responses 
+        WHERE survey_id = ? AND question_id = ? 
+        GROUP BY answer 
+        ORDER BY count DESC
+    ");
+    $stats->execute([$survey_id, $question['id']]);
+    $question['stats'] = $stats->fetchAll(PDO::FETCH_ASSOC);
+    
+    $total = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as total FROM user_responses WHERE survey_id = ? AND question_id = ?");
+    $total->execute([$survey_id, $question['id']]);
+    $question['total_responses'] = $total->fetchColumn();
+}
+
+// Общее количество участников опроса
+$total_participants = $pdo->prepare("SELECT COUNT(DISTINCT user_id) FROM user_responses WHERE survey_id = ?");
+$total_participants->execute([$survey_id]);
+$total_participants_count = $total_participants->fetchColumn();
+?>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Результаты: <?php echo htmlspecialchars($survey_data['title']); ?></title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .question-stats {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .stat-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+        .stat-bar {
+            height: 20px;
+            background: #007bff;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Результаты опроса: <?php echo htmlspecialchars($survey_data['title']); ?></h1>
+        <p>Всего участников: <strong><?php echo $total_participants_count; ?></strong></p>
+        
+        <a href="surveys-list.php">← Вернуться к списку опросов</a>
+        
+        <?php if ($total_participants_count == 0): ?>
+            <p style="margin: 20px 0;">Пока никто не прошел этот опрос.</p>
+        <?php else: ?>
+            <?php foreach ($questions_data as $question): ?>
+                <div class="question-stats">
+                    <h3><?php echo htmlspecialchars($question['question_text']); ?></h3>
+                    <p>Ответов: <?php echo $question['total_responses']; ?></p>
+                    
+                    <?php if (!empty($question['stats'])): ?>
+                        <?php foreach ($question['stats'] as $stat): ?>
+                            <div class="stat-item">
+                                <div><?php echo htmlspecialchars($stat['answer']); ?></div>
+                                <div>
+                                    <strong><?php echo $stat['count']; ?></strong> 
+                                    (<?php echo round(($stat['count'] / $question['total_responses']) * 100, 1); ?>%)
+                                </div>
+                                <div class="stat-bar" style="width: <?php echo ($stat['count'] / $question['total_responses']) * 100; ?>%;"></div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p>Нет данных по ответам на этот вопрос.</p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+        
+        <div style="margin-top: 30px;">
+            <a href="take-survey.php?id=<?php echo $survey_id; ?>">Пройти этот опрос</a>
+        </div>
+    </div>
+</body>
+</html>

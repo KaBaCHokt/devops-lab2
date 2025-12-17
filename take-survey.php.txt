@@ -1,0 +1,145 @@
+<?php
+require_once 'db-init.php';
+
+$survey_id = $_GET['id'] ?? 0;
+
+// Получаем информацию об опросе
+$survey = $pdo->prepare("SELECT * FROM surveys WHERE id = ? AND is_active = 1");
+$survey->execute([$survey_id]);
+$survey_data = $survey->fetch(PDO::FETCH_ASSOC);
+
+if (!$survey_data) {
+    die("Опрос не найден или неактивен.");
+}
+
+// Получаем вопросы опроса
+$questions = $pdo->prepare("
+    SELECT * FROM survey_questions 
+    WHERE survey_id = ? 
+    ORDER BY question_order
+");
+$questions->execute([$survey_id]);
+$questions_data = $questions->fetchAll(PDO::FETCH_ASSOC);
+
+// Получаем варианты ответов для каждого вопроса
+foreach ($questions_data as &$question) {
+    $options = $pdo->prepare("
+        SELECT * FROM question_options 
+        WHERE question_id = ? 
+        ORDER BY option_order
+    ");
+    $options->execute([$question['id']]);
+    $question['options'] = $options->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Обработка отправки формы
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user_id = uniqid('user_');
+    
+    foreach ($_POST['answers'] as $question_id => $answer) {
+        if (is_array($answer)) {
+            $answer = implode(', ', $answer);
+        }
+        
+        $stmt = $pdo->prepare("
+            INSERT INTO user_responses (survey_id, question_id, user_id, answer) 
+            VALUES (?, ?, ?, ?)
+        ");
+        $stmt->execute([$survey_id, $question_id, $user_id, $answer]);
+    }
+    
+    header("Location: survey-thanks.php?survey_id=" . $survey_id);
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Опрос: <?php echo htmlspecialchars($survey_data['title']); ?></title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .question-block {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        .option-item {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+        .option-item label {
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .submit-btn {
+            background: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><?php echo htmlspecialchars($survey_data['title']); ?></h1>
+        <?php if (!empty($survey_data['description'])): ?>
+            <p><?php echo htmlspecialchars($survey_data['description']); ?></p>
+        <?php endif; ?>
+        
+        <a href="surveys-list.php">← Вернуться к списку опросов</a>
+        
+        <form method="POST">
+            <?php foreach ($questions_data as $question): ?>
+                <div class="question-block">
+                    <h3><?php echo htmlspecialchars($question['question_text']); ?></h3>
+                    
+                    <?php if (!empty($question['options'])): ?>
+                        <?php foreach ($question['options'] as $option): ?>
+                            <div class="option-item">
+                                <input type="radio" 
+                                       name="answers[<?php echo $question['id']; ?>]" 
+                                       value="<?php echo htmlspecialchars($option['option_text']); ?>" 
+                                       id="option_<?php echo $option['id']; ?>"
+                                       required>
+                                <label for="option_<?php echo $option['id']; ?>">
+                                    <?php echo htmlspecialchars($option['option_text']); ?>
+                                </label>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <textarea name="answers[<?php echo $question['id']; ?>]" 
+                                  rows="4" 
+                                  placeholder="Введите ваш ответ..." 
+                                  required></textarea>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+            
+            <div style="margin-top: 30px;">
+                <button type="submit" class="submit-btn">Отправить ответы</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
