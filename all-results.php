@@ -4,11 +4,13 @@ require_once 'db-init.php';
 // Общая статистика
 $total_surveys = $pdo->query("SELECT COUNT(*) FROM surveys")->fetchColumn();
 $total_responses = $pdo->query("SELECT COUNT(DISTINCT user_id, survey_id) FROM user_responses")->fetchColumn();
+
+// Самый популярный опрос
 $popular_survey = $pdo->query("
-    SELECT s.title, COUNT(DISTINCT r.user_id) as participants 
+    SELECT s.id, s.title, COUNT(DISTINCT r.user_id) as participants 
     FROM surveys s 
     LEFT JOIN user_responses r ON s.id = r.survey_id 
-    GROUP BY s.id 
+    GROUP BY s.id, s.title
     ORDER BY participants DESC 
     LIMIT 1
 ")->fetch(PDO::FETCH_ASSOC);
@@ -18,51 +20,23 @@ $all_surveys = $pdo->query("
     SELECT s.id, s.title, COUNT(DISTINCT r.user_id) as participants 
     FROM surveys s 
     LEFT JOIN user_responses r ON s.id = r.survey_id 
-    GROUP BY s.id 
+    GROUP BY s.id, s.title
     ORDER BY participants DESC
 ")->fetchAll(PDO::FETCH_ASSOC);
 ?>
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Общая статистика</title>
     <style>
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 30px 0;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #007bff;
-            margin: 10px 0;
-        }
-        .survey-list {
-            margin: 30px 0;
-        }
-        .survey-item {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }
+        .stat-card { background: white; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .stat-number { font-size: 2.5em; font-weight: bold; color: #007bff; margin: 10px 0; }
+        .survey-list { margin: 30px 0; }
+        .survey-item { background: white; padding: 15px; margin: 10px 0; border-radius: 5px; border: 1px solid #ddd; }
+        .survey-item:hover { background: #f8f9fa; }
     </style>
 </head>
 <body>
@@ -93,16 +67,20 @@ $all_surveys = $pdo->query("
         
         <div class="survey-list">
             <h2>Все опросы</h2>
-            <?php foreach ($all_surveys as $survey): ?>
-                <div class="survey-item">
-                    <a href="survey-results.php?id=<?php echo $survey['id']; ?>">
-                        <?php echo htmlspecialchars($survey['title']); ?>
-                    </a>
-                    <span style="float: right;">
-                        <?php echo $survey['participants']; ?> участников
-                    </span>
-                </div>
-            <?php endforeach; ?>
+            <?php if (empty($all_surveys)): ?>
+                <p>Нет созданных опросов.</p>
+            <?php else: ?>
+                <?php foreach ($all_surveys as $survey): ?>
+                    <div class="survey-item">
+                        <a href="survey-results.php?id=<?php echo $survey['id']; ?>" style="text-decoration: none; color: #333;">
+                            <strong><?php echo htmlspecialchars($survey['title']); ?></strong>
+                        </a>
+                        <span style="float: right; color: #666;">
+                            <?php echo $survey['participants']; ?> участников
+                        </span>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </body>
