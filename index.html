@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система опросов (PostgreSQL)</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f5f5f5; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 50px; }
+        .header h1 { color: #2c3e50; margin-bottom: 10px; }
+        .actions { display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .btn { display: inline-block; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-size: 18px; width: 300px; text-align: center; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn:hover { opacity: 0.9; }
+        .footer { text-align: center; margin-top: 50px; color: #666; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Система создания и прохождения опросов</h1>
+            <p>На базе PostgreSQL. Создавайте опросы, собирайте ответы, анализируйте статистику</p>
+        </div>
+        
+        <div class="actions">
+            <a href="create-survey.php" class="btn btn-primary">
+                Создать новый опрос
+            </a>
+            <a href="surveys-list.php" class="btn btn-secondary">
+                Пройти существующий опрос
+            </a>
+            <a href="all-results.php" class="btn btn-secondary">
+                Посмотреть статистику
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>Система работает на PostgreSQL | PHP 8+ | Nginx</p>
+        </div>
+    </div>
+</body>
+</html>
