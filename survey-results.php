@@ -14,9 +14,13 @@ if (!$survey_data) {
 
 // Вопросы опроса
 $questions = $pdo->prepare("
-    SELECT * FROM survey_questions 
-    WHERE survey_id = ? 
-    ORDER BY question_order
+    SELECT q.*, 
+           json_agg(json_build_object('text', o.option_text, 'order', o.option_order)) as options
+    FROM survey_questions q
+    LEFT JOIN question_options o ON q.id = o.question_id
+    WHERE q.survey_id = ?
+    GROUP BY q.id
+    ORDER BY q.question_order
 ");
 $questions->execute([$survey_id]);
 $questions_data = $questions->fetchAll(PDO::FETCH_ASSOC);
@@ -31,75 +35,61 @@ foreach ($questions_data as &$question) {
         ORDER BY count DESC
     ");
     $stats->execute([$survey_id, $question['id']]);
-    $question['stats'] = $stats->fetchAll(PDO::FETCH_ASSOC);
+    $question['stats'] = $stats->fetchAll();
     
     $total = $pdo->prepare("SELECT COUNT(DISTINCT user_id) as total FROM user_responses WHERE survey_id = ? AND question_id = ?");
     $total->execute([$survey_id, $question['id']]);
     $question['total_responses'] = $total->fetchColumn();
 }
 
-// Общее количество участников опроса
+// Общее количество участников
 $total_participants = $pdo->prepare("SELECT COUNT(DISTINCT user_id) FROM user_responses WHERE survey_id = ?");
 $total_participants->execute([$survey_id]);
 $total_participants_count = $total_participants->fetchColumn();
 ?>
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Результаты: <?php echo htmlspecialchars($survey_data['title']); ?></title>
     <style>
-        .container {
-            max-width: 800px;
-            margin: 20px auto;
-            padding: 20px;
-        }
-        .question-stats {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        .stat-item {
-            margin: 10px 0;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-        }
-        .stat-bar {
-            height: 20px;
-            background: #007bff;
-            border-radius: 3px;
-            margin-top: 5px;
-        }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; }
+        .question-stats { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .stat-item { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+        .stat-bar { height: 20px; background: #007bff; border-radius: 3px; margin-top: 5px; }
+        .total-participants { background: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Результаты опроса: <?php echo htmlspecialchars($survey_data['title']); ?></h1>
-        <p>Всего участников: <strong><?php echo $total_participants_count; ?></strong></p>
-        
         <a href="surveys-list.php">← Вернуться к списку опросов</a>
         
+        <div class="total-participants">
+            <h3>Всего участников: <?php echo $total_participants_count; ?></h3>
+        </div>
+        
         <?php if ($total_participants_count == 0): ?>
-            <p style="margin: 20px 0;">Пока никто не прошел этот опрос.</p>
+            <p style="text-align: center; padding: 40px; color: #666;">
+                Пока никто не прошел этот опрос.
+            </p>
         <?php else: ?>
             <?php foreach ($questions_data as $question): ?>
                 <div class="question-stats">
                     <h3><?php echo htmlspecialchars($question['question_text']); ?></h3>
-                    <p>Ответов: <?php echo $question['total_responses']; ?></p>
+                    <p><strong>Ответов:</strong> <?php echo $question['total_responses']; ?></p>
                     
                     <?php if (!empty($question['stats'])): ?>
                         <?php foreach ($question['stats'] as $stat): ?>
                             <div class="stat-item">
-                                <div><?php echo htmlspecialchars($stat['answer']); ?></div>
+                                <div><strong><?php echo htmlspecialchars($stat['answer']); ?></strong></div>
                                 <div>
-                                    <strong><?php echo $stat['count']; ?></strong> 
-                                    (<?php echo round(($stat['count'] / $question['total_responses']) * 100, 1); ?>%)
+                                    <?php echo $stat['count']; ?> 
+                                    (<?php echo $question['total_responses'] > 0 ? round(($stat['count'] / $question['total_responses']) * 100, 1) : 0; ?>%)
                                 </div>
-                                <div class="stat-bar" style="width: <?php echo ($stat['count'] / $question['total_responses']) * 100; ?>%;"></div>
+                                <?php if ($question['total_responses'] > 0): ?>
+                                    <div class="stat-bar" style="width: <?php echo ($stat['count'] / $question['total_responses']) * 100; ?>%;"></div>
+                                <?php endif; ?>
                             </div>
                         <?php endforeach; ?>
                     <?php else: ?>
