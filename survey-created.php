@@ -7,35 +7,10 @@ $survey_id = $_GET['id'] ?? 0;
     <meta charset="UTF-8">
     <title>Опрос создан</title>
     <style>
-        .container {
-            max-width: 600px;
-            margin: 100px auto;
-            padding: 40px;
-            text-align: center;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .success-icon {
-            font-size: 4em;
-            color: #28a745;
-            margin-bottom: 20px;
-        }
-        .actions {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-        .btn {
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: white;
-            width: 250px;
-            text-align: center;
-        }
+        .container { max-width: 600px; margin: 100px auto; padding: 40px; text-align: center; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .success-icon { font-size: 4em; color: #28a745; margin-bottom: 20px; }
+        .actions { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .btn { padding: 12px 25px; border-radius: 5px; text-decoration: none; color: white; width: 250px; text-align: center; }
         .primary { background: #007bff; }
         .secondary { background: #6c757d; }
     </style>
