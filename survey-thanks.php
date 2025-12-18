@@ -7,36 +7,10 @@ $survey_id = $_GET['survey_id'] ?? 0;
     <meta charset="UTF-8">
     <title>Спасибо!</title>
     <style>
-        .container {
-            max-width: 600px;
-            margin: 100px auto;
-            padding: 40px;
-            text-align: center;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-        .thanks-icon {
-            font-size: 4em;
-            color: #007bff;
-            margin-bottom: 20px;
-        }
-        .actions {
-            margin-top: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            align-items: center;
-        }
-        .btn {
-            padding: 12px 25px;
-            border-radius: 5px;
-            text-decoration: none;
-            color: white;
-            width: 250px;
-            text-align: center;
-            background: #007bff;
-        }
+        .container { max-width: 600px; margin: 100px auto; padding: 40px; text-align: center; background: white; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .thanks-icon { font-size: 4em; color: #007bff; margin-bottom: 20px; }
+        .actions { margin-top: 30px; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .btn { padding: 12px 25px; border-radius: 5px; text-decoration: none; color: white; width: 250px; text-align: center; background: #007bff; }
     </style>
 </head>
 <body>
